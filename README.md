@@ -75,6 +75,7 @@ Created 'example.png' with 8 frames.
 
 Here’s the markdown version of the updated table you asked for:
 
+
 | Name                  | Display | Scan | Link                                                                 |
 |-----------------------|:-------:|:----:|----------------------------------------------------------------------|
 | COLDCARD Q            | Y       | Y    | [Coldcard Q (Coinkite)](https://coldcard.com)                        |
@@ -88,6 +89,7 @@ Here’s the markdown version of the updated table you asked for:
 | Trident AnchorWatch   | Y       | Y    | [Trident Vault / AnchorWatch](https://anchorwatch.com)               |
 | Cove Wallet           | Y       | Y    | [Cove Wallet](https://github.com/bitcoinppl/cove)                    |
 | BullBitcoin Wallet    | Y       | Y    | [BULL Wallet (Bull Bitcoin)](https://bullbitcoin.com/blog/bull-by-bull-bitcoin) |
+
 
 # Code Examples
 
