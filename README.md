@@ -15,7 +15,7 @@ Quick links:
 
 # Specification
 
-See full spec [BBQr.md](BBQr.md).
+See full spec [BBQr.md](./BBQr.md).
 
 # Summary
 
@@ -59,7 +59,7 @@ spread across in 1,295 version 40 QR codes.
 
 # Example Image
 
-![Example of BBQr Image](example.png)
+![Example of BBQr Image](./example.png)
 
 The above BBQr encodes the entire specification itself (so meta). 
 
@@ -203,7 +203,7 @@ bbqr make UNLICENSE.md -o stdout -v 5
 1) Using **COLDCARD Q** choose `Scan Any QR Code` from main menu and scan this Seed QR
    to temporarily import a new seed:
 
-![simulator_seed_qr](sim_sqr.png)
+![simulator_seed_qr](./sim_sqr.png)
 
 ```patch
 - This seed is the COLDCARD simulator key and is well known!
@@ -218,21 +218,21 @@ bbqr make UNLICENSE.md -o stdout -v 5
 
 ### PSBT: Basic 1 input 2 outputs
 
-![tx-1in2out](small.png)
+![tx-1in2out](./small.png)
 
 ### PSBT: 10 in, 2 out with Locktimes
 
-![tx-10in2out-locktimes](locktimes.png)
+![tx-10in2out-locktimes](./locktimes.png)
 
 ## Multisig
 
 1) Navigate to `Scan Any QR Code` and import below 15of15 multisig.
 
-![multisig-15of15](15of15.png)
+![multisig-15of15](./15of15.png)
 
 2) Sign below multisig PSBT
 
-![change_psbt_multisig-15of15](change_psbt_15of15.png)
+![change_psbt_multisig-15of15](./change_psbt_15of15.png)
 
 3) Above should fail because of exotic sighash (NONE). Navigate to
    `Advanced/Tools -> Danger Zone -> Sighash Checks` and choose to `Warn` only.
@@ -252,16 +252,16 @@ requires EDGE firmware 6.3.3QX or later
 
 1) Import CSA threshold Tapscript multisig with static provably unspendable internal key:
 
-![tapscript_threshold](minisc.png)
+![tapscript_threshold](./minisc.png)
 
 2) Sign PSBT:
 
-![tapscript_threshold_psbt](minisc_psbt.png)
+![tapscript_threshold_psbt](./minisc_psbt.png)
 
 1) import MiniTapScript with ranged probably unspendable internal key:
 
-![minitapscript](minitapscript.png)
+![minitapscript](./minitapscript.png)
 
 2) Sign PSBT
 
-![minitapscript_psbt](minitapscript_psbt.png)
+![minitapscript_psbt](./minitapscript_psbt.png)
