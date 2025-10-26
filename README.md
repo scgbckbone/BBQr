@@ -110,7 +110,26 @@ These will load your clipboard with example data suitable for the COLDCARD Q Sim
 
 See also [`psbt_faker`](https://github.com/Coldcard/psbt_faker)
 
-PLACEHOLDER
+```
+% psbt_faker - | bbqr make - -t P | pbcopy
+A single QR version 18 will be needed.
+
+% bbqr make - --fake-data 2048000 -t P | pbcopy
+A single QR version 35 will be needed.
+
+% psbt_faker -n 200 - | bbqr make - -t P -r | pbcopy
+Need 5 QR's each of version 37.
+```
+
+These are round-trip examples, where encode and decode are performed.
+
+```
+% psbt_faker -n 10 - | bbqr make - -t P -r | bbqr decode
+A single QR version 25 will be needed.
+PSBT File:
+cHNidP....
+
+```
 
 Dumping BBQr to console:
 ```
