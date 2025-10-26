@@ -73,23 +73,84 @@ Created 'example.png' with 8 frames.
 
 # Supporting Projects
 
-Here’s the markdown version of the updated table you asked for:
-
-
-| Name                  | Display | Scan | Link                                                                 |
-|-----------------------|:-------:|:----:|----------------------------------------------------------------------|
-| COLDCARD Q            | Y       | Y    | [Coldcard Q (Coinkite)](https://coldcard.com)                        |
-| COLDCARD Mk4          | Y       | N    | [Coldcard Mk4 (Coinkite)](https://coldcard.com)                      |
-| Sparrow Wallet        | Y       | Y    | [Sparrow Wallet](https://sparrowwallet.com)                          |
-| Nunchuk               | Y       | Y    | [Nunchuk Wallet](https://nunchuk.app)                                |
-| BTCPay Server         | Y       | Y    | [BTCPay Server](https://btcpayserver.org)                            |
-| Krux                  | Y       | Y    | [Krux Firmware](https://github.com/krux-wallet)                      |
-| LabelBase             | Y       | Y    | [Labelbase](https://labelbase.org)                                   |
-| FullyNoded            | Y       | Y    | [Fully Noded](https://fullynoded.app)                                |
-| Trident AnchorWatch   | Y       | Y    | [Trident Vault / AnchorWatch](https://anchorwatch.com)               |
-| Cove Wallet           | Y       | Y    | [Cove Wallet](https://github.com/bitcoinppl/cove)                    |
-| BullBitcoin Wallet    | Y       | Y    | [BULL Wallet (Bull Bitcoin)](https://bullbitcoin.com/blog/bull-by-bull-bitcoin) |
-
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th style="text-align: center;">Display</th>
+      <th style="text-align: center;">Scan</th>
+      <th>Link</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>COLDCARD Q</td>
+      <td style="text-align: center;">Y</td>
+      <td style="text-align: center;">Y</td>
+      <td><a href="https://coldcard.com">Coldcard Q (Coinkite)</a></td>
+    </tr>
+    <tr>
+      <td>COLDCARD Mk4</td>
+      <td style="text-align: center;">Y</td>
+      <td style="text-align: center;">N</td>
+      <td><a href="https://coldcard.com">Coldcard Mk4 (Coinkite)</a></td>
+    </tr>
+    <tr>
+      <td>Sparrow Wallet</td>
+      <td style="text-align: center;">Y</td>
+      <td style="text-align: center;">Y</td>
+      <td><a href="https://sparrowwallet.com">Sparrow Wallet</a></td>
+    </tr>
+    <tr>
+      <td>Nunchuk</td>
+      <td style="text-align: center;">Y</td>
+      <td style="text-align: center;">Y</td>
+      <td><a href="https://nunchuk.app">Nunchuk Wallet</a></td>
+    </tr>
+    <tr>
+      <td>BTCPay Server</td>
+      <td style="text-align: center;">Y</td>
+      <td style="text-align: center;">Y</td>
+      <td><a href="https://btcpayserver.org">BTCPay Server</a></td>
+    </tr>
+    <tr>
+      <td>Krux</td>
+      <td style="text-align: center;">Y</td>
+      <td style="text-align: center;">Y</td>
+      <td><a href="https://github.com/krux-wallet">Krux Firmware</a></td>
+    </tr>
+    <tr>
+      <td>LabelBase</td>
+      <td style="text-align: center;">Y</td>
+      <td style="text-align: center;">Y</td>
+      <td><a href="https://labelbase.org">Labelbase</a></td>
+    </tr>
+    <tr>
+      <td>FullyNoded</td>
+      <td style="text-align: center;">Y</td>
+      <td style="text-align: center;">Y</td>
+      <td><a href="https://fullynoded.app">Fully Noded</a></td>
+    </tr>
+    <tr>
+      <td>Trident AnchorWatch</td>
+      <td style="text-align: center;">Y</td>
+      <td style="text-align: center;">Y</td>
+      <td><a href="https://anchorwatch.com">Trident Vault / AnchorWatch</a></td>
+    </tr>
+    <tr>
+      <td>Cove Wallet</td>
+      <td style="text-align: center;">Y</td>
+      <td style="text-align: center;">Y</td>
+      <td><a href="https://github.com/bitcoinppl/cove">Cove Wallet</a></td>
+    </tr>
+    <tr>
+      <td>BullBitcoin Wallet</td>
+      <td style="text-align: center;">Y</td>
+      <td style="text-align: center;">Y</td>
+      <td><a href="https://bullbitcoin.com/blog/bull-by-bull-bitcoin">BULL Wallet (Bull Bitcoin)</a></td>
+    </tr>
+  </tbody>
+</table>
 
 # Code Examples
 
