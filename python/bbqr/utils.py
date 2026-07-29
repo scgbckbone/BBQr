@@ -5,6 +5,7 @@
 #
 import re, zlib
 from base64 import b32encode, b32decode
+from .consts import MAX_SIZE
 
 HEX_RE = re.compile(r'\A[0-9A-F]*\Z')
 
@@ -57,7 +58,7 @@ def encode_data(raw, encoding=None):
 
     return encoding, data, 8
 
-def decode_data(parts, encoding):
+def decode_data(parts, encoding, max_size=MAX_SIZE):
     # give back the bytes after decoding
     # - already in order
     # - keeps the parts separate here to validate correct split from encoder
@@ -66,6 +67,7 @@ def decode_data(parts, encoding):
         for p in parts:
             assert HEX_RE.match(p), 'non-canonical hex body'
             rv += bytes.fromhex(p)
+        assert len(rv) <= max_size, 'decoded data too large'
         return rv
 
     # base32 decode, but insert padding for API
@@ -82,13 +84,25 @@ def decode_data(parts, encoding):
         assert b32encode(here).decode('ascii').rstrip('=') == p, 'non-canonical Base32 body'
         rv += here
 
+    assert len(rv) <= max_size, 'decoded data too large'
+
     if encoding == 'Z':
-        # decompress
+        # decompress in 1k chunks: keeps zlib's back-reference distance check
+        # close to the 1k window implied by wbits=10, and applies the size cap
+        # while inflating instead of after the full output has been buffered
         z = zlib.decompressobj(wbits=-10)
-        rv = z.decompress(rv)
-        rv += z.flush()
+        chunks = []
+        total = 0
+        while rv and not z.eof:
+            here = z.decompress(rv, 1024)
+            total += len(here)
+            assert total <= max_size, 'decompressed data too large'
+            chunks.append(here)
+            rv = z.unconsumed_tail
+        chunks.append(z.flush())
         assert z.eof, 'incomplete DEFLATE stream'
         assert not z.unused_data, 'trailing data after DEFLATE stream'
+        rv = b''.join(chunks)
 
     return rv
         

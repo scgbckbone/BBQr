@@ -5,13 +5,13 @@
 #
 import re
 from .utils import decode_data
-from .consts import HEADER_LEN, KNOWN_FILETYPES
+from .consts import HEADER_LEN, KNOWN_FILETYPES, MAX_SIZE
 
 # strict header grammar: B$ magic, known encoding, one uppercase letter of
 # file type, then uppercase base-36 digits for part count and index
 HEADER_RE = re.compile(r'\AB\$[H2Z][A-Z][0-9A-Z]{2}[0-9A-Z]{2}\Z')
 
-def join_qrs(parts):
+def join_qrs(parts, max_size=MAX_SIZE):
     # take a bunch of scanned data.
     # - put into order, decode, return type code and raw data bytes
     # - lazy desktop code here
@@ -58,7 +58,7 @@ def join_qrs(parts):
 
     parts = [data[i] for i in range(num_parts)]
 
-    raw = decode_data(parts, encoding)
+    raw = decode_data(parts, encoding, max_size)
 
     assert raw, 'empty transfer'
 
