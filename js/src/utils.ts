@@ -9,6 +9,8 @@ import pako from 'pako';
 import { QR_DATA_CAPACITY } from './consts';
 import type { Encoding, SplitOptions, Version } from './types';
 
+const HEX_RE = /^[0-9A-F]*$/;
+
 export function hexToBytes(hex: string) {
   // convert a hex string to a Uint8Array
 
@@ -198,11 +200,23 @@ export function decodeData(parts: string[], encoding: Encoding) {
   // decode the parts back into a Uint8Array
 
   if (encoding === 'H') {
-    return joinByteParts(parts.map((p) => hexToBytes(p)));
+    return joinByteParts(
+      parts.map((p) => {
+        if (p.length % 2 || !HEX_RE.test(p)) {
+          throw new Error('non-canonical hex body');
+        }
+
+        return hexToBytes(p);
+      })
+    );
   }
 
   const bytes = joinByteParts(
-    parts.map((p) => {
+    parts.map((p, i) => {
+      if (i < parts.length - 1 && p.length % 8) {
+        throw new Error('non-final Base32 body length must be a multiple of 8');
+      }
+
       const padding = (8 - (p.length % 8)) % 8;
 
       return base32.decode(p + '='.repeat(padding));
@@ -210,7 +224,24 @@ export function decodeData(parts: string[], encoding: Encoding) {
   );
 
   if (encoding === 'Z') {
-    return pako.inflate(bytes, { windowBits: -10 });
+    const inflator = new pako.Inflate({ windowBits: -10 });
+    inflator.push(bytes, true);
+
+    if (inflator.err) {
+      throw new Error(`invalid DEFLATE stream: ${inflator.msg}`);
+    }
+
+    const { ended, strm } = inflator as any;
+
+    if (!ended) {
+      throw new Error('incomplete DEFLATE stream');
+    }
+
+    if (strm.avail_in) {
+      throw new Error('trailing data after DEFLATE stream');
+    }
+
+    return inflator.result as Uint8Array;
   }
 
   return bytes;
