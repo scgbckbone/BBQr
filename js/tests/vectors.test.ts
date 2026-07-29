@@ -25,6 +25,14 @@ describe('BBQr BIP draft vectors', () => {
       expect(() => joinQRs(c.frames)).toThrow();
     });
   }
+
+  // draft v4: receivers MAY ignore later duplicates without comparing;
+  // we compare bodies and fail on conflict - stricter local policy
+  for (const c of doc.strict_policy_cases) {
+    test(`reject ${c.name} (strict local policy)`, () => {
+      expect(() => joinQRs(c.frames)).toThrow();
+    });
+  }
 });
 
 describe('DEFLATE resource limits', () => {
@@ -35,6 +43,26 @@ describe('DEFLATE resource limits', () => {
     ).trim();
 
     expect(() => joinQRs([frame])).toThrow(/distance/);
+  });
+
+  test('window boundary: distance 1024 accepted, 1025 rejected', () => {
+    const ok = readFileSync(
+      new URL('../../test_data/deflate-dist1024.txt', import.meta.url),
+      'utf-8'
+    ).trim();
+
+    const { raw } = joinQRs([ok]);
+    expect(raw.length).toBe(2048);
+    expect(createHash('sha256').update(raw).digest('hex')).toBe(
+      'c30537f307aa7aed41677a596ea4f60de232ff2dc2ef7b478e6ae53e300db05d'
+    );
+
+    const bad = readFileSync(
+      new URL('../../test_data/deflate-dist1025.txt', import.meta.url),
+      'utf-8'
+    ).trim();
+
+    expect(() => joinQRs([bad])).toThrow(/distance/);
   });
 
   test('cap decompressed size while inflating', () => {

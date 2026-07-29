@@ -234,10 +234,14 @@ export function decodeData(parts: string[], encoding: Encoding, maxSize = DEFAUL
   }
 
   if (encoding === 'Z') {
-    // small output chunks keep zlib's back-reference distance check close to
-    // the 1k window implied by wbits=10, and let the size cap apply while
-    // inflating instead of after the full output has been buffered
+    // small output chunks let the size cap apply while inflating, instead of
+    // after the full output has been buffered
     const inflator = new pako.Inflate({ windowBits: -10, chunkSize: 1024 });
+
+    // pako ships zlib's strict distance check but leaves dmax at 32768 for
+    // raw streams; pin it to the 1k window so distance >1024 is rejected
+    // exactly (boundary-tested so a pako upgrade cannot silently break this)
+    (inflator as any).strm.state.dmax = 1024;
 
     const chunks: Uint8Array[] = [];
     let total = 0;
