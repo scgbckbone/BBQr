@@ -6,7 +6,7 @@
 
 import { base32 } from '@scure/base';
 import pako from 'pako';
-import { QR_DATA_CAPACITY } from './consts';
+import { DEFAULT_MAX_SIZE, QR_DATA_CAPACITY } from './consts';
 import type { Encoding, SplitOptions, Version } from './types';
 
 const HEX_RE = /^[0-9A-F]*$/;
@@ -196,11 +196,11 @@ export function encodeData(raw: Uint8Array, encoding?: Encoding) {
   };
 }
 
-export function decodeData(parts: string[], encoding: Encoding) {
+export function decodeData(parts: string[], encoding: Encoding, maxSize = DEFAULT_MAX_SIZE) {
   // decode the parts back into a Uint8Array
 
   if (encoding === 'H') {
-    return joinByteParts(
+    const raw = joinByteParts(
       parts.map((p) => {
         if (p.length % 2 || !HEX_RE.test(p)) {
           throw new Error('non-canonical hex body');
@@ -209,6 +209,12 @@ export function decodeData(parts: string[], encoding: Encoding) {
         return hexToBytes(p);
       })
     );
+
+    if (raw.length > maxSize) {
+      throw new Error('decoded data too large');
+    }
+
+    return raw;
   }
 
   const bytes = joinByteParts(
@@ -223,8 +229,30 @@ export function decodeData(parts: string[], encoding: Encoding) {
     })
   );
 
+  if (bytes.length > maxSize) {
+    throw new Error('decoded data too large');
+  }
+
   if (encoding === 'Z') {
-    const inflator = new pako.Inflate({ windowBits: -10 });
+    // small output chunks keep zlib's back-reference distance check close to
+    // the 1k window implied by wbits=10, and let the size cap apply while
+    // inflating instead of after the full output has been buffered
+    const inflator = new pako.Inflate({ windowBits: -10, chunkSize: 1024 });
+
+    const chunks: Uint8Array[] = [];
+    let total = 0;
+
+    inflator.onData = (data) => {
+      const chunk = data as Uint8Array;
+      total += chunk.length;
+
+      if (total > maxSize) {
+        throw new Error('decompressed data too large');
+      }
+
+      chunks.push(chunk);
+    };
+
     inflator.push(bytes, true);
 
     if (inflator.err) {
@@ -241,7 +269,7 @@ export function decodeData(parts: string[], encoding: Encoding) {
       throw new Error('trailing data after DEFLATE stream');
     }
 
-    return inflator.result as Uint8Array;
+    return joinByteParts(chunks);
   }
 
   return bytes;

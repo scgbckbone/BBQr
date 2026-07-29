@@ -4,7 +4,7 @@
  * QR code decoding/joining.
  */
 
-import { ENCODINGS, HEADER_LEN } from './consts';
+import { DEFAULT_MAX_SIZE, ENCODINGS, HEADER_LEN } from './consts';
 import { Encoding, JoinResult } from './types';
 import { decodeData } from './utils';
 
@@ -16,9 +16,10 @@ const HEADER_RE = /^B\$[H2Z][A-Z][0-9A-Z]{2}[0-9A-Z]{2}$/;
  * Decodes and joins QR code parts back to binary data.
  *
  * @param parts Array of QR code parts
+ * @param maxSize Cap on decoded/decompressed transfer size in bytes.
  * @returns Object containing the file type, encoding, and raw binary data.
  */
-export function joinQRs(parts: string[]): JoinResult {
+export function joinQRs(parts: string[], maxSize = DEFAULT_MAX_SIZE): JoinResult {
   for (const p of parts) {
     if (!HEADER_RE.test(p.slice(0, HEADER_LEN))) {
       throw new Error(`invalid header: ${p.slice(0, HEADER_LEN)}`);
@@ -101,7 +102,7 @@ export function joinQRs(parts: string[]): JoinResult {
     throw new Error('final part too long');
   }
 
-  const raw = decodeData(orderedParts, encoding);
+  const raw = decodeData(orderedParts, encoding, maxSize);
 
   if (!raw.length) {
     throw new Error('empty transfer');
