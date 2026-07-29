@@ -3,8 +3,10 @@
 #
 # - helpers and basics
 #
-import zlib
+import re, zlib
 from base64 import b32encode, b32decode
+
+HEX_RE = re.compile(r'\A[0-9A-F]*\Z')
 
 def version_to_chars(v):
     # return number of **chars** that fit into indicated version QR
@@ -60,19 +62,33 @@ def decode_data(parts, encoding):
     # - already in order
     # - keeps the parts separate here to validate correct split from encoder
     if encoding == 'H':
-        return b''.join(bytes.fromhex(p) for p in parts)
+        rv = b''
+        for p in parts:
+            assert HEX_RE.match(p), 'non-canonical hex body'
+            rv += bytes.fromhex(p)
+        return rv
 
     # base32 decode, but insert padding for API
     rv = b''
-    for p in parts:
-        padding = (8 - (len(p) % 8)) % 8
-        rv += b32decode(p + (padding*'='))
+    for n, p in enumerate(parts):
+        residue = len(p) % 8
+        is_final = (n == len(parts) - 1)
+        bad_length = residue in (1, 3, 6) if is_final else residue != 0
+        assert not bad_length, 'invalid Base32 body length'
+
+        padding = (8 - residue) % 8
+        here = b32decode(p + (padding*'='))
+        # non-zero pad bits in the final Base32 symbol are non-canonical
+        assert b32encode(here).decode('ascii').rstrip('=') == p, 'non-canonical Base32 body'
+        rv += here
 
     if encoding == 'Z':
         # decompress
         z = zlib.decompressobj(wbits=-10)
         rv = z.decompress(rv)
         rv += z.flush()
+        assert z.eof, 'incomplete DEFLATE stream'
+        assert not z.unused_data, 'trailing data after DEFLATE stream'
 
     return rv
         
