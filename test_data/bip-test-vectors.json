@@ -4,7 +4,8 @@
   "notes": [
     "Frames were generated independently by the Python and JavaScript reference implementations and matched exactly.",
     "All vectors decode in reverse frame order.",
-    "Raw DEFLATE output is not canonical across compressor implementations; decoders must accept any valid stream constrained to a 1024-byte window."
+    "Raw DEFLATE output is not canonical across compressor implementations; decoders must accept any valid stream constrained to a 1024-byte window.",
+    "Duplicate-body comparison is receiver policy. A receiver must not overwrite the first accepted body; it may ignore later duplicates or report a detected mismatch."
   ],
   "generated_from": {
     "coinkite_bbqr_repository": "https://github.com/coinkite/BBQr",
@@ -19,72 +20,94 @@
     {
       "name": "zero-total",
       "reason": "The total frame count is zero.",
-      "frames": ["B$HP0000AA"]
+      "frames": [
+        "B$HP0000AA"
+      ]
     },
     {
       "name": "index-not-less-than-total",
       "reason": "Index 01 is not valid when the total is 01.",
-      "frames": ["B$HP0101AA"]
+      "frames": [
+        "B$HP0101AA"
+      ]
     },
     {
       "name": "maximum-index-overflow",
       "reason": "For total ZZ, the last valid index is ZY.",
-      "frames": ["B$HTZZZZAA"]
+      "frames": [
+        "B$HTZZZZAA"
+      ]
     },
     {
       "name": "unknown-encoding",
       "reason": "Q is not a defined encoding.",
-      "frames": ["B$QP0100AA"]
+      "frames": [
+        "B$QP0100AA"
+      ]
     },
     {
       "name": "empty-body",
       "reason": "Every frame body is non-empty.",
-      "frames": ["B$HT0100"]
+      "frames": [
+        "B$HT0100"
+      ]
     },
     {
       "name": "odd-hex-body",
       "reason": "Every H body has even length.",
-      "frames": ["B$HP0100A"]
+      "frames": [
+        "B$HP0100A"
+      ]
     },
     {
       "name": "lowercase-hex-body",
       "reason": "H uses uppercase hexadecimal.",
-      "frames": ["B$HT0100aa"]
+      "frames": [
+        "B$HT0100aa"
+      ]
     },
     {
       "name": "invalid-base32-terminal-length",
       "reason": "An unpadded Base32 terminal body cannot have residue one.",
-      "frames": ["B$2P0100A"]
+      "frames": [
+        "B$2P0100A"
+      ]
     },
     {
       "name": "noncanonical-base32-pad-bits",
       "reason": "AB decodes with non-zero pad bits; the canonical encoding is AA.",
-      "frames": ["B$2P0100AB"]
+      "frames": [
+        "B$2P0100AB"
+      ]
     },
     {
       "name": "missing-frame",
       "reason": "A two-frame transfer is incomplete without index 01.",
-      "frames": ["B$HT0200AA"]
+      "frames": [
+        "B$HT0200AA"
+      ]
     },
     {
       "name": "mixed-transfer-header",
       "reason": "The type code changes within one collected transfer.",
-      "frames": ["B$HT0200AA", "B$HP0201CC"]
-    },
-    {
-      "name": "conflicting-duplicate",
-      "reason": "The same index is supplied with two different bodies.",
-      "frames": ["B$HT0200AA", "B$HT0200BB", "B$HT0201CC"]
+      "frames": [
+        "B$HT0200AA",
+        "B$HP0201CC"
+      ]
     },
     {
       "name": "zlib-wrapper",
       "reason": "Z requires raw DEFLATE, not a zlib wrapper.",
-      "frames": ["B$ZP0100PCOEWTCKAYAAETIBE4"]
+      "frames": [
+        "B$ZP0100PCOEWTCKAYAAETIBE4"
+      ]
     },
     {
       "name": "deflate-trailing-data",
       "reason": "Data follows the raw DEFLATE end-of-stream marker.",
-      "frames": ["B$ZP0100JNGEUBQAAA"]
+      "frames": [
+        "B$ZP0100JNGEUBQAAA"
+      ]
     }
   ],
   "vectors": [
@@ -147,6 +170,18 @@
         "B$2T0200AIAAAAABLW3Z5U7SZHQJDCFWTV4F2WCMKEXISIJXTKTWED25GBW4S53YLUVAAAAAADECBKJ6QOEK5P7TCB7OD27ZE3VZ3MUGYBGXLLGYFZ6FOHJCAF7KM75ZHTLECTAQ64TGRP7WDD2WWIB77WJT74LKJR24N3D3PTDJWZVJUMMJ3SYCS7UGPGC77YN3SRHKJIAWYSIVQY7CR3F6PD2VI36JKD3SACW5WQFQIKFAMYGVAP4AXPPM4WON2C4AE3IXCEYEFAVJKKZSLNGIGIVK2U7F636WJVLXPICDUT33OISZONNI7AWP4QAWKWOCEW7JK33J7KSDVPCGCUZE45HBQ7QTVAIIBXQUZYWGSGXFSVOAQVL5ADALNUYAKZZGDQ7L",
         "B$2T0201LKM7777774AQCAAAAAAAAAAAZA5SMBE52XMF3QV2OXD7EFXMFGJFB6A345XCX5FGQ3IUEE7MYN3GP34IVJZUNY5YYMPXFTMV5AJK47FM3VHVB3VM5KL6AWG5VEUVOPWL4PJYC4OOJG6L3FWZLP3U6ONXENZWRIB255YX3JUSZCLTUFOGT5JU7ZA4LV3CQWFBPE7YLIURVTKFP5ZQOEY3MIINJIBLZ5Y2GXIFPCY6FPWHRZRTUDDFVVLCW6P4ABK2UFZ6NRYGKCSDS3OFZACEIAM66I3Z73FN2XJNA2MAH6Z4XN32TPTSROTRPHAXQN55AIVWEZ4AEGHH2S5V243CK5CXTAAAAAAA"
       ]
+    }
+  ],
+  "strict_policy_cases": [
+    {
+      "name": "conflicting-duplicate",
+      "reason": "The same index is supplied with two different bodies.",
+      "frames": [
+        "B$HT0200AA",
+        "B$HT0200BB",
+        "B$HT0201CC"
+      ],
+      "note": "Draft v4: a receiver MAY ignore a later duplicate without comparing bodies; failing on a detected conflict is stricter local policy, not a normative requirement."
     }
   ]
 }

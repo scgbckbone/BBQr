@@ -21,10 +21,30 @@ def test_negative_vectors(case):
     with pytest.raises((AssertionError, ValueError, zlib.error)):
         bbqr.join_qrs(case['frames'])
 
+@pytest.mark.parametrize('case', DOC['strict_policy_cases'], ids=lambda c: c['name'])
+def test_strict_policy_cases(case):
+    # draft v4: receivers MAY ignore later duplicates without comparing;
+    # we compare bodies and fail on conflict - stricter local policy
+    with pytest.raises(AssertionError):
+        bbqr.join_qrs(case['frames'])
+
 def test_overwide_deflate_distance():
     # back-reference distance of 2048 needs a bigger window than wbits=10 allows
     frame = open('../test_data/deflate-overwide-distance.txt').read().strip()
-    with pytest.raises(zlib.error):
+    with pytest.raises(AssertionError, match='window'):
+        bbqr.join_qrs([frame])
+
+def test_deflate_window_boundary():
+    # distance 1024 is the window maximum and must decode
+    frame = open('../test_data/deflate-dist1024.txt').read().strip()
+    _, raw = bbqr.join_qrs([frame])
+    assert len(raw) == 2048
+    assert hashlib.sha256(raw).hexdigest() == \
+        'c30537f307aa7aed41677a596ea4f60de232ff2dc2ef7b478e6ae53e300db05d'
+
+    # distance 1025 exceeds the window and must be rejected
+    frame = open('../test_data/deflate-dist1025.txt').read().strip()
+    with pytest.raises(AssertionError, match='window'):
         bbqr.join_qrs([frame])
 
 def test_decompressed_size_cap():
