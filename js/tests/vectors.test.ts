@@ -65,6 +65,14 @@ describe('DEFLATE resource limits', () => {
     expect(() => joinQRs([bad])).toThrow(/distance/);
   });
 
+  test('reject invalid maxSize', () => {
+    const v = doc.vectors[0];
+
+    for (const bad of [NaN, 0, -1, 1.5, Infinity]) {
+      expect(() => joinQRs(v.frames, bad)).toThrow(RangeError);
+    }
+  });
+
   test('cap decompressed size while inflating', () => {
     const v = doc.vectors.find((v: { name: string }) => v.name === 'deflate-psbt');
 

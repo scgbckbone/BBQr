@@ -199,6 +199,11 @@ export function encodeData(raw: Uint8Array, encoding?: Encoding) {
 export function decodeData(parts: string[], encoding: Encoding, maxSize = DEFAULT_MAX_SIZE) {
   // decode the parts back into a Uint8Array
 
+  // NaN would compare false against every length and disable the caps
+  if (!Number.isSafeInteger(maxSize) || maxSize <= 0) {
+    throw new RangeError('maxSize must be a positive safe integer');
+  }
+
   if (encoding === 'H') {
     const raw = joinByteParts(
       parts.map((p) => {
